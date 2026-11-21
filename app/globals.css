@@ -291,3 +291,13 @@ button:disabled { opacity: 0.45; cursor: not-allowed; }
   height: 100% !important;
   border: 0;
 }
+.results { margin-top: 12px; border: 1px solid var(--border); border-radius: 12px; padding: 8px; background: rgba(0,0,0,0.25); }
+.results-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); padding: 2px 4px 6px; text-transform: uppercase; letter-spacing: 0.08em; }
+.result { display: flex; align-items: center; gap: 10px; padding: 6px; border-radius: 10px; cursor: pointer; }
+.result:hover { background: var(--panel-hover); }
+.add-plus { font-size: 20px; color: var(--accent); padding: 0 6px; }
+.results { margin-top: 12px; border: 1px solid var(--border); border-radius: 12px; padding: 8px; background: rgba(0,0,0,0.25); }
+.results-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); padding: 2px 4px 6px; text-transform: uppercase; letter-spacing: 0.08em; }
+.result { display: flex; align-items: center; gap: 10px; padding: 6px; border-radius: 10px; cursor: pointer; }
+.result:hover { background: var(--panel-hover); }
+.add-plus { font-size: 20px; color: var(--accent); padding: 0 6px; }
