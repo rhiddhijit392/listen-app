@@ -61,6 +61,8 @@ function SortableSong({ song, isCurrent, onSelect, onRemove }) {
 
 /* ---------- room ---------- */
 export default function Room({ roomId }) {
+    const [results, setResults] = useState([]);
+    const [searching, setSearching] = useState(false);
     const [joined, setJoined] = useState(false);
     const [name, setName] = useState('');
     const [pw, setPw] = useState('');
@@ -221,6 +223,27 @@ export default function Room({ roomId }) {
         socket.emit('add', { roomId, url }, (res) => {
             if (res?.error) setError(res.error);
             else { setError(''); setUrl(''); }
+        });
+    };
+
+    const isLink = (s) => /^https?:\/\//i.test(s) || /youtu/i.test(s);
+
+    const submit = () => {
+        const v = url.trim();
+        if (!v) return;
+        if (isLink(v)) return addSong();   // pasted link: add directly
+        setSearching(true);
+        socket.emit('search', { roomId, q: v }, (res) => {
+            setSearching(false);
+            if (res?.error) setError(res.error);
+            else { setError(''); setResults(res.results); }
+        });
+    };
+
+    const addResult = (r) => {
+        socket.emit('add', { roomId, url: `https://www.youtube.com/watch?v=${r.videoId}` }, (res) => {
+            if (res?.error) setError(res.error);
+            else setError('');
         });
     };
 
@@ -415,12 +438,33 @@ export default function Room({ roomId }) {
                                 className="input"
                                 value={url}
                                 onChange={(e) => setUrl(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && addSong()}
-                                placeholder="Paste a YouTube link"
+                                onKeyDown={(e) => e.key === 'Enter' && submit()}
+                                placeholder="Search a song or paste a YouTube link"
                             />
-                            <button className="btn" onClick={addSong}>Add</button>
+                            <button className="btn" onClick={submit} disabled={searching}>
+                                {searching ? '...' : 'Add'}
+                            </button>
                         </div>
                         {error && <p className="error">{error}</p>}
+
+                        {results.length > 0 && (
+                            <div className="results">
+                                <div className="results-head">
+                                    <span>Search results</span>
+                                    <button className="remove" onClick={() => setResults([])}>✕</button>
+                                </div>
+                                {results.map((r) => (
+                                    <div className="result" key={r.videoId} onClick={() => addResult(r)}>
+                                        <img className="thumb" src={`https://i.ytimg.com/vi/${r.videoId}/mqdefault.jpg`} alt="" />
+                                        <div className="song-info">
+                                            <div className="song-title">{r.title}</div>
+                                            <div className="song-by">{r.channel}</div>
+                                        </div>
+                                        <span className="add-plus">＋</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
                         {state.queue.length === 0 ? (
                             <p className="empty">The queue is empty.</p>
